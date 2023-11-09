@@ -4,47 +4,48 @@ public class Solver {
     public static void main(String[] args) {
         Session session = new Session();
         Scanner scanner = new Scanner(System.in);
-        
+
+        while (!session.isLoggedIn()) {
+            OutputManagement.cleanTerminal();
+            System.out.print("Bem vindo ao HSC\n");
+            System.out.print("1 - Login\n");
+            System.out.print("2 - Registrar\n");
+            System.out.print("0 - Sair\n");
+
+            System.out.printf("Digite o comando desejado: ");
+            int option = scanner.nextInt();
+            OutputManagement.cleanTerminal();
+
+            switch (option) {
+                case 1:
+                    System.out.print("Digite seu nome de usuário: ");
+                    String username = scanner.next();
+                    System.out.print("Digite sua senha: ");
+                    String password = scanner.next();
+                    session.Login(username, password);
+                    break;
+                case 2:
+                    System.out.print("Digite seu nome de usuário: ");
+                    username = scanner.next();
+                    System.out.print("Digite sua senha: ");
+                    password = scanner.next();
+                    session.Register(username, password);
+                    break;
+                case 0:
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.print("Opção inválida\n");
+                    break;
+            }
+            OutputManagement.cleanTerminal();
+        }
         OutputManagement.cleanTerminal();
 
-        System.out.println("Bem vindo ao sistema HSC");
-        while (true) {
-            if(!session.isLoggedIn()){
-                System.out.println("1 - Login");
-                System.out.println("2 - Cadastrar usuário");
-                System.out.println("0 - Sair");
-
-                System.out.printf("Digite o comando desejado: ");
-                int option = scanner.nextInt();
-                
-
-                switch (option) {
-                    case 1:
-                        System.out.print("Digite o nome de usuário(Sem espaços):");
-                        String username = scanner.next();
-                        System.out.print("Digite a senha(Sem espaços):");
-                        String password = scanner.next();
-                        session.login(username, password);
-                        break;
-                    case 2:
-                        System.out.print("Digite o nome de usuário(Sem espaços):");
-                        String username2 = scanner.next();
-                        System.out.print("Digite a senha(Sem espaços):");
-                        String password2 = scanner.next();
-                        session.createAccount(username2, password2);
-                        break;
-                    case 0:
-                        System.out.println("Saindo...");
-                        System.exit(0);
-                        break;
-                    default:
-                        System.out.println("Comando inválido");
-                        break;
-                }
-                OutputManagement.cleanTerminal();
-            }
-            else{
-                System.out.println("Bem vindo " + session.getAccount().getUsername()+ "!\n");
+        if (session.getSessionAccountUserType() == UserType.USER_STD) {
+            StdUserRepository stdUserRepository = new StdUserRepository();
+            while (true) {
+                System.out.println("Bem vindo " + session.sessionGetAccountUsername() + "!");
                 System.out.println("1 - Criar um arquivo");             //Create
                 System.out.println("2 - Listar arquivos");              //Read
                 System.out.println("3 - Ver conteúdo de um arquivo");   //READ
@@ -59,110 +60,62 @@ public class Solver {
 
                 System.out.printf("Digite o comando desejado: ");
                 int option = scanner.nextInt();
-                
-                switch (option) {
+                OutputManagement.cleanTerminal();
+
+                switch(option) {
                     case 1:
-                        scanner.nextLine(); //Limpa o buffer do scanner
-                        System.out.println("Digite o nome do arquivo (Sem espaços):");
-                        String filename = scanner.nextLine();
-                
-                        System.out.println("Digite o conteúdo do arquivo (Sem quebras de linha):");
+                        System.out.printf("Digite o nome do arquivo: ");
+                        String filename = scanner.next();
+                        System.out.printf("Digite o conteúdo do arquivo: ");
                         String content = scanner.nextLine();
-                        session.createArchive(filename, content);
+                        stdUserRepository.createFile(session, filename, content);
+                        OutputManagement.cleanTerminal();
                         break;
 
                     case 2:
+                        ArrayList<String> files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
                         OutputManagement.cleanTerminal();
-                        session.showUserFiles();
-                        System.out.println("\nDigite qualquer caractere e aperte enter para sair...");
-                        scanner.next().charAt(0);
                         break;
-                    
+
                     case 3:
+                        files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.printf("Digite o nome do arquivo: ");
+                        filename = scanner.next();
+                        System.out.println("\n" + stdUserRepository.getFileContent(session, filename) + "\n");
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
                         OutputManagement.cleanTerminal();
-                        session.showUserFiles();
-                        System.out.println("\nDigite o nome do arquivo que deseja ver o conteúdo:");
-                        String filename2 = scanner.next();
-                        session.showFileContent(filename2);
-                        System.out.println("\nDigite qualquer caractere e aperte enter para sair...");
-                        scanner.next().charAt(0);
                         break;
 
-                    case 4:
-                        OutputManagement.cleanTerminal();
-                        session.showUserFiles();
-                        System.out.println("\nDigite o nome do arquivo que deseja alterar:");
-                        String filename3 = scanner.next();
-                        scanner.nextLine(); //Limpa o buffer do scanner
-                        System.out.println("Digite o novo conteúdo do arquivo (Sem quebras de linha):");
-                        String content2 = scanner.nextLine();
-                        session.updateFileContent(filename3, content2);
-                        break;
-
-                    case 5:
-                        OutputManagement.cleanTerminal();
-                        session.showUserFiles();
-                        System.out.println("\nDigite o nome do arquivo que deseja alterar:");
-                        String filename4 = scanner.next();
-                        scanner.nextLine(); //Limpa o buffer do scanner
-                        System.out.println("Digite o novo conteúdo do arquivo (Sem quebras de linha):");
-                        String content3 = scanner.nextLine();
-                        content3 = "\n" + content3; //Adiciona uma nova linha ao arquivo
-                        session.concatFileContent(filename4, content3);
-                        break;
-
-                    case 6:
-                        OutputManagement.cleanTerminal();
-                        session.showUserFiles();
-                        System.out.println("\nDigite o nome do arquivo que deseja deletar:");
-                        String filename5 = scanner.next();
-                        session.deleteFile(filename5);
-                        break;
-
-                    case 7:
-                        OutputManagement.cleanTerminal();
-                        session.showUsers();
-                        System.out.println("\nDigite qualquer caractere e aperte enter para sair...");
-                        scanner.next().charAt(0);
-                        break;
-
-                    case 8:
-                        OutputManagement.cleanTerminal();
-                        session.showUsers();
-                        System.out.println("\nDigite o nome do usuário que deseja ver os arquivos:");
-                        String username = scanner.next();
-                        session.showOtherUserFiles(username);
-                        System.out.println("\nDigite qualquer caractere e aperte enter para sair...");
-                        scanner.next().charAt(0);
-                        break;
-
-                    case 9:
-                        OutputManagement.cleanTerminal();
-                        session.printFeed();
-                        System.out.println("\nDigite qualquer caractere e aperte enter para sair...");
-                        scanner.next().charAt(0);
-                        break;
-                    
-                    case 10:
-                        OutputManagement.cleanTerminal();
-                        scanner.nextLine(); //Limpa o buffer do scanner
-                        System.out.println("Digite o título do post (Sem espaços):");
-                        String title = scanner.nextLine();
-
-                        System.out.println("Digite o conteúdo do post (Sem quebras de linha):");
-                        String content4 = scanner.nextLine();
-                        session.addPost(content4, title);
-                        break;
                     case 0:
-                        System.out.println("Saindo...");
+                        scanner.close();
                         System.exit(0);
                         break;
                     default:
-                        System.out.println("Comando inválido");
+                        System.out.println("Opção inválida");
                         break;
                 }
-                OutputManagement.cleanTerminal();
             }
         }
+
+        if (session.getSessionAccountUserType() == UserType.USER_ADM) {
+            
+        }
+
+        if (session.getSessionAccountUserType() == UserType.USER_MOD) {
+            
+        }
+
+        scanner.close();
     }
 }

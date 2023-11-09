@@ -10,7 +10,14 @@ public class Post {
         this.title = title;
         this.user = user;
         this.content = content;
-        this.date = new Date(System.currentTimeMillis());
+        this.date =  new Date(System.currentTimeMillis());
+    }
+
+    public Post(Account user, String content, String title, String date){
+        this.title = title;
+        this.user = user;
+        this.content = content;
+        this.date = Date.valueOf(date);
     }
 
     public Account getUser() {
