@@ -4,7 +4,7 @@ build: *.java
 	javac $^
 
 exec: build
-	java -cp . Solver
+	java -cp . Program
 
 clean:
 	rm *.class

@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Solver {
+public class Program {
     public static void main(String[] args) {
         Session session = new Session();
         Scanner scanner = new Scanner(System.in);
