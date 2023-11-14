@@ -39,4 +39,14 @@ public class Post {
     public Date getDate() {
         return this.date;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+            " Titulo='" + getTitle() + "'" +
+            ", usuário='" + getUser() + "'" +
+            ", conteúdo='" + getContent() + "'" +
+            ", date='" + getDate() + "'" +
+            "}";
+    }
 }

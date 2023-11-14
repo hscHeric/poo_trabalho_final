@@ -337,4 +337,23 @@ public class SocialRepository {
         }
         return null;
     }
+
+    public ArrayList<String> getFilesFromUserFolderByUsername(String username){
+        ArrayList<String> filenames = new ArrayList<String>();
+        File directory = new File("user_data/"+username);
+        if (!directory.exists()) {
+            throw new RuntimeException("Erro: o usuário não tem diretório criado:  " + directory.getName());
+        }
+        File[] files = directory.listFiles();
+        for(File file : files){
+            filenames.add(file.getName());
+        }
+        return filenames;
+    }
+
+    public ArrayList<Post> getFeed() {
+        this.posts = new ArrayList<Post>();
+        this.ReadPostsFromCSV();
+        return this.posts;
+    }
 }

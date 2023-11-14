@@ -8,3 +8,4 @@ exec: build
 
 clean:
 	rm *.class
+	clear
