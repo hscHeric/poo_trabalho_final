@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class StdUserRepository{
 
-    private SocialRepository _sRepository;
+    protected SocialRepository _sRepository;
 
     public StdUserRepository() {
         this._sRepository = new SocialRepository();

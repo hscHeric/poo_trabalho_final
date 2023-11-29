@@ -22,6 +22,10 @@ public class Account {
     public String getPassword() {
         return this.password;
     }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
 }
 
 enum UserType {

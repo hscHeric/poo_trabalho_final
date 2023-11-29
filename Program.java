@@ -217,7 +217,7 @@ public class Program {
 
 
         if (session.getSessionAccountUserType() == UserType.USER_MOD) {
-            StdUserRepository stdUserRepository = new ModUserRepository();
+            ModUserRepository stdUserRepository = new ModUserRepository();
             while (true) {
                 System.out.println("Bem vindo " + session.sessionGetAccountUsername() + "!");
                 System.out.println("1 - Criar um arquivo");             //Create
@@ -226,11 +226,12 @@ public class Program {
                 System.out.println("4 - Alterar um arquivo");           //UPDATE
                 System.out.println("5 - Concatenar conteúdo em um arquivo"); //Adiciona uma nova linha ao arquivo
                 System.out.println("6 - Deletar um arquivo");           //DELETE
-                System.out.println("7 - Listar usuários");
-                System.out.println("8 - Listar arquivos de um usuário");
-                System.out.println("9 - Olhar feed");
-                System.out.println("10 - Postar");
-                System.out.println("11 - TODO");
+                System.out.println("7 - Listar usuários"); //READ
+                System.out.println("8 - Listar arquivos de um usuário"); //READ
+                System.out.println("9 - Olhar feed"); //READ
+                System.out.println("10 - Postar"); //CREATE
+                System.out.println("11 - Excluir post"); //DELETE
+                System.out.println("12 - Excluir usuário"); //DELETE
                 System.out.println("0 - Sair");
 
                 System.out.printf("Digite o comando desejado: ");
@@ -369,6 +370,34 @@ public class Program {
                         stdUserRepository.createPost(session, title, content);
                         OutputManagement.cleanTerminal();
                         break;
+
+                    case 11:
+                        posts = stdUserRepository.getFeed(session);
+                        for (Post post : posts) {
+                            System.out.printf("Título: %s\n", post.getTitle());
+                            System.out.printf("Autor: %s\n", post.getUser().getUsername());
+                            System.out.printf("Conteúdo: %s\n", post.getContent());
+                            System.out.printf("Data: %s\n", post.getDate());
+                            System.out.println();
+                        }
+                        System.out.printf("Digite o título do post: ");
+                        title = scanner.next();
+                        stdUserRepository.deletePost(session, title);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 12:
+                        users = stdUserRepository.getUserList(session);
+                        System.out.println("Usuários: ");
+                        for (String user : users) {
+                            System.out.println(user);
+                        }
+                        System.out.printf("Digite o nome do usuário: ");
+                        username = scanner.next();
+                        stdUserRepository.deleteUser(session, username);
+                        OutputManagement.cleanTerminal();
+                        break;
+
                     case 0:
                         scanner.close();
                         System.exit(0);
@@ -381,7 +410,225 @@ public class Program {
         }
 
         if (session.getSessionAccountUserType() == UserType.USER_ADM) {
-            
+            AdmUserRepository stdUserRepository = new AdmUserRepository();
+            while (true) {
+                System.out.println("Bem vindo " + session.sessionGetAccountUsername() + "!");
+                System.out.println("1 - Criar um arquivo");             //Create
+                System.out.println("2 - Listar arquivos");              //Read
+                System.out.println("3 - Ver conteúdo de um arquivo");   //READ
+                System.out.println("4 - Alterar um arquivo");           //UPDATE
+                System.out.println("5 - Concatenar conteúdo em um arquivo"); //Adiciona uma nova linha ao arquivo
+                System.out.println("6 - Deletar um arquivo");           //DELETE
+                System.out.println("7 - Listar usuários"); //READ
+                System.out.println("8 - Listar arquivos de um usuário"); //READ
+                System.out.println("9 - Olhar feed"); //READ
+                System.out.println("10 - Postar"); //CREATE
+                System.out.println("11 - Excluir post"); //DELETE
+                System.out.println("12 - Excluir usuário"); //DELETE
+                System.out.println("13 - Adicionar permissão de moderador"); //UPDATE
+                System.out.println("14 - Remover permissão de moderador"); //UPDATE
+                System.out.println("0 - Sair");
+
+                System.out.printf("Digite o comando desejado: ");
+                int option = scanner.nextInt();
+                OutputManagement.cleanTerminal();
+
+                switch(option) {
+                    case 1:
+                        System.out.printf("Digite o nome do arquivo: ");
+                        String filename = scanner.next();
+                        System.out.printf("Digite o conteúdo do arquivo: ");
+                        String content = scanner.nextLine();
+                        stdUserRepository.createFile(session, filename, content);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 2:
+                        ArrayList<String> files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 3:
+                        files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.printf("Digite o nome do arquivo: ");
+                        filename = scanner.next();
+                        System.out.println("\n" + stdUserRepository.getFileContent(session, filename) + "\n");
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 4:
+                        files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.printf("Digite o nome do arquivo: ");
+                        filename = scanner.next();
+                        System.out.printf("Digite o novo conteúdo do arquivo: ");
+                        //buffer do nextLine
+                        scanner.nextLine();
+                        content = scanner.nextLine();
+                        stdUserRepository.updateFile(session, filename, content);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 5:
+                        files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.printf("Digite o nome do arquivo: ");
+                        filename = scanner.next();
+                        System.out.printf("Digite o conteúdo a ser adicionado ao arquivo: ");
+                        scanner.nextLine();
+                        content = scanner.nextLine();
+                        content = "\n" + content;
+                        stdUserRepository.concatenateFileContent(session, filename, content);
+                        OutputManagement.cleanTerminal();
+                        break;      
+                        
+                    case 6:
+                        files = stdUserRepository.getFileList(session);
+                        System.out.println("Seus arquivos: ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+                        System.out.printf("Digite o nome do arquivo: ");
+                        filename = scanner.next();
+                        stdUserRepository.deleteFile(session, filename);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 7:
+                        ArrayList<String> users = stdUserRepository.getUserList(session);
+                        System.out.println("Usuários: ");
+                        for (String user : users) {
+                            System.out.println(user);
+                        }
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 8:
+                        //Imprimir lista de usuários
+                        users = stdUserRepository.getUserList(session);
+                        System.out.println("Usuários: ");
+                        for (String user : users) {
+                            System.out.println(user);
+                        }
+                        System.out.printf("Digite o nome do usuário: ");
+                        String username = scanner.next();
+                        files = stdUserRepository.getUserFileList(session, username);
+                        System.out.println("Arquivos de " + username + ": ");
+                        for (String file : files) {
+                            System.out.println(file);
+                        }
+
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
+                        OutputManagement.cleanTerminal();
+                        break;
+                    case 9:
+                        ArrayList<Post> posts = stdUserRepository.getFeed(session);
+                        for (Post post : posts) {
+                            System.out.printf("Título: %s\n", post.getTitle());
+                            System.out.printf("Autor: %s\n", post.getUser().getUsername());
+                            System.out.printf("Conteúdo: %s\n", post.getContent());
+                            System.out.printf("Data: %s\n", post.getDate());
+                            System.out.println();
+                        }
+                        System.out.println("Digite qualquer caractere para continuar e pressione enter");
+                        scanner.next();
+                        OutputManagement.cleanTerminal();
+
+                        break;
+                    case 10:
+                        System.out.printf("Digite o título do post: ");
+                        String title = scanner.next();
+                        System.out.printf("Digite o conteúdo do post: ");
+                        scanner.nextLine();
+                        content = scanner.nextLine();
+                        stdUserRepository.createPost(session, title, content);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 11:
+                        posts = stdUserRepository.getFeed(session);
+                        for (Post post : posts) {
+                            System.out.printf("Título: %s\n", post.getTitle());
+                            System.out.printf("Autor: %s\n", post.getUser().getUsername());
+                            System.out.printf("Conteúdo: %s\n", post.getContent());
+                            System.out.printf("Data: %s\n", post.getDate());
+                            System.out.println();
+                        }
+                        System.out.printf("Digite o título do post: ");
+                        title = scanner.next();
+                        stdUserRepository.deletePost(session, title);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 12:
+                        users = stdUserRepository.getUserList(session);
+                        System.out.println("Usuários: ");
+                        for (String user : users) {
+                            System.out.println(user);
+                        }
+                        System.out.printf("Digite o nome do usuário: ");
+                        username = scanner.next();
+                        stdUserRepository.deleteUser(session, username);
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 13:
+                        List<Account> accounts = stdUserRepository.getStdUsers();
+                        System.out.println("Usuários: ");
+                        for (Account account : accounts) {
+                            System.out.println(account.getUsername());
+                        }
+                        System.out.printf("Digite o nome do usuário: ");
+                        username = scanner.next();
+                        stdUserRepository.setUserToMod(session, username);
+
+                        OutputManagement.cleanTerminal();
+                        break;
+
+                    case 14:
+                        accounts = stdUserRepository.getModUsers();
+                        System.out.println("Usuários: ");
+                        for (Account account : accounts) {
+                            System.out.println(account.getUsername());
+                        }
+                        System.out.printf("Digite o nome do usuário: ");
+                        username = scanner.next();
+                        stdUserRepository.setUserToStd(session, username);
+
+                        OutputManagement.cleanTerminal();
+                        break;
+
+
+                    case 0:
+                        scanner.close();
+                        System.exit(0);
+                        break;
+                    default:
+                        System.out.println("Opção inválida");
+                        break;
+                }
+            }
         }
 
         scanner.close();

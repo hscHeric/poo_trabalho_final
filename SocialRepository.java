@@ -356,4 +356,108 @@ public class SocialRepository {
         this.ReadPostsFromCSV();
         return this.posts;
     }
+
+    public void removePostFromFeed(String title) {
+        for(Post post : this.posts){
+            if(post.getTitle().equals(title)){
+                this.posts.remove(post);
+                break;
+            }
+        }
+        WritePostToCSV();
+    }
+
+    //Delete user
+    public void deleteUser(String sessionUsername, String username) {
+        if(sessionUsername.equals(username)){
+            throw new RuntimeException("Não é possível deletar a si mesmo");
+        }
+        Account sessionUser = null;
+        for(Account account : this.users){
+            if(account.getUsername().equals(sessionUsername)){
+                sessionUser = account;
+                break;
+            }
+        }
+
+        Account userToDelete = null;
+        for(Account account : this.users){
+            if(account.getUsername().equals(username)){
+                userToDelete = account;
+                break;
+            }
+        }
+
+        if(sessionUser.getUserType() == UserType.USER_STD){
+            throw new RuntimeException("Você não tem permissão para deletar usuários");
+        }
+
+        if(userToDelete.getUserType() == sessionUser.getUserType()){
+            throw new RuntimeException("Você não tem permissão para deletar usuários do mesmo tipo que você");
+        }
+
+        if(userToDelete.getUserType() == UserType.USER_ADM){
+            throw new RuntimeException("Você não tem permissão para deletar usuários administradores");
+        }
+
+        if(sessionUser.getUserType() == UserType.USER_ADM && userToDelete.getUserType() == UserType.USER_MOD){
+            throw new RuntimeException("Você não tem permissão para deletar usuários administradores");
+        }
+
+        this.users.remove(userToDelete);
+        DeleteUserFolder(username);
+        DeleteAllPostFromUser(username);
+        WriteUsersToCSV();
+    }
+
+    private void DeleteAllPostFromUser(String username) {
+        for(Post post : this.posts){
+            if(post.getUser().getUsername().equals(username)){
+                this.posts.remove(post);
+            }
+        }
+        WritePostToCSV();
+    }
+
+    public void changeUserType(String username, UserType userType){
+        for(Account user : this.users){
+            if(user.getUsername().equals(username)){
+                user.setUserType(userType);
+                break;
+            }
+        }
+        WriteUsersToCSV();
+    }
+
+    public void DeleteUserFolder(String username){
+        File directory = new File("user_data/"+username);
+        if (!directory.exists()) {
+            throw new RuntimeException("Erro: o usuário não tem diretório criado:  " + directory.getName());
+        }
+        File[] files = directory.listFiles();
+        for(File file : files){
+            file.delete();
+        }
+        directory.delete();
+    }
+
+    public List<Account> getModUsers(){
+        List<Account> modUsers = new ArrayList<Account>();
+        for(Account user : this.users){
+            if(user.getUserType() == UserType.USER_MOD){
+                modUsers.add(user);
+            }
+        }
+        return modUsers;
+    }
+
+    public List<Account> getStdUsers() {
+        List<Account> stdUsers = new ArrayList<Account>();
+        for(Account user : this.users){
+            if(user.getUserType() == UserType.USER_STD){
+                stdUsers.add(user);
+            }
+        }
+        return stdUsers;
+    }
 }
