@@ -4,7 +4,8 @@ public class Program {
     public static void main(String[] args) {
         Session session = new Session();
         Scanner scanner = new Scanner(System.in);
-
+        try {
+        
         while (!session.isLoggedIn()) {
             OutputManagement.cleanTerminal();
             System.out.print("Bem vindo ao HSC\n");
@@ -632,5 +633,9 @@ public class Program {
         }
 
         scanner.close();
+        } catch (Exception e) {
+            System.out.println("Não foi possível carregar os dados do sistema");
+            System.exit(0);
+        }
     }
 }
